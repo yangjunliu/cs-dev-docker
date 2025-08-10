@@ -1,0 +1,80 @@
+name: common-services-dev
+services:
+  mysql:
+    image: mysql:${MYSQL_VERSION}
+    environment:
+      TZ: ${TZ}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_ROOT_HOST: "%"
+    volumes:
+      - ${DIR_DATA}/mysql:/var/lib/mysql
+      - ${DIR_LOGS}/mysql:/var/log/mysql
+      - ${DIR_CONFIG}/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
+    hostname: mysql
+    container_name: ${NAME}-mysql
+    ports:
+      - "${MYSQL_HOST_PORT}:3306"
+    networks:
+      - csdev
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  php74:
+    build: 
+      context: ${DIR_CONFIG}/php74/
+      dockerfile: Dockerfile
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DIR_CONFIG}/php74/php.ini:/usr/local/etc/php/php.ini:ro
+      - ${DIR_CONFIG}/php74/php-fpm.conf:/usr/local/etc/php-fpm.d/zz-custom.conf:ro
+      - ${DIR_LOGS}/php74/log:/var/log/php
+      - ${DIR_WWW}:/www
+    working_dir: /www
+    hostname: php74
+    container_name: ${NAME}-php74
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - csdev
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+  nginx:
+    image: nginx:${NGINX_VERSION}
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DIR_CONFIG}/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ${DIR_CONFIG}/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ${DIR_CONFIG}/nginx/ssl:/etc/nginx/ssl:ro
+      - ${DIR_LOGS}/nginx:/var/log/nginx
+      - ${DIR_WWW}:/www
+    working_dir: /www
+    hostname: nginx
+    container_name: ${NAME}-nginx
+    ports:
+      - "${NGINX_HTTP_HOST_PORT}:80"
+      - "${NGINX_HTTPS_HOST_PORT}:443"
+    networks:
+      csdev:
+        aliases:
+          - example.test.com
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+
+networks:
+  csdev:
+    driver: bridge

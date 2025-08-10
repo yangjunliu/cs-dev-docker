@@ -1,0 +1,7 @@
+.idea
+.vscode
+.env
+docker-compose.yml
+/www/*
+/logs/*
+/data/*
