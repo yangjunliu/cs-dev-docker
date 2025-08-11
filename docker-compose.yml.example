@@ -11,7 +11,7 @@ services:
       - ${DIR_LOGS}/mysql:/var/log/mysql
       - ${DIR_CONFIG}/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf:ro
     hostname: mysql
-    container_name: ${NAME}-mysql
+    container_name: ${APP_NAME}-mysql
     ports:
       - "${MYSQL_HOST_PORT}:3306"
     networks:
@@ -36,7 +36,7 @@ services:
       - ${DIR_WWW}:/www
     working_dir: /www
     hostname: php74
-    container_name: ${NAME}-php74
+    container_name: ${APP_NAME}-php74
     cap_add:
       - SYS_PTRACE
     networks:
@@ -60,7 +60,7 @@ services:
       - ${DIR_WWW}:/www
     working_dir: /www
     hostname: nginx
-    container_name: ${NAME}-nginx
+    container_name: ${APP_NAME}-nginx
     ports:
       - "${NGINX_HTTP_HOST_PORT}:80"
       - "${NGINX_HTTPS_HOST_PORT}:443"
