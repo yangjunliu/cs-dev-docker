@@ -1,7 +1,9 @@
 name: common-services-dev
 services:
   mysql:
-    image: mysql:${MYSQL_VERSION}
+    build: 
+      context: ${DIR_CONFIG}/mysql/
+      dockerfile: Dockerfile
     environment:
       TZ: ${TZ}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
@@ -42,6 +44,29 @@ services:
     networks:
       - csdev
     restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "1"
+  php74-cli:
+    build: 
+      context: ${DIR_CONFIG}/php74-cli/
+      dockerfile: Dockerfile
+    environment:
+      TZ: ${TZ}
+    volumes:
+      - ${DIR_CONFIG}/php74-cli/php.ini:/usr/local/etc/php/php.ini:ro
+      - ${DIR_LOGS}/php74-cli/log:/var/log/php
+      - ${DIR_WWW}:/www
+    working_dir: /www
+    hostname: php74-cli
+    container_name: ${APP_NAME}-php74-cli
+    cap_add:
+      - SYS_PTRACE
+    networks:
+      - csdev
+    restart: no
     logging:
       driver: "json-file"
       options:

@@ -1,0 +1,1 @@
+* * * * * docker-compose run --rm php74-cli php /www/demo/artisan --version
